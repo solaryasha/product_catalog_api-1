@@ -20,11 +20,8 @@ app.get('/users', (request, response) => {
   });
 });
 
-app.get('/users/:userId', (request, response) => {
-  const { userId } = request.params;
-
-  response.send();
-});
+// app.get('/users/:userId', (request, response) => {
+// });
 
 app.listen(PORT, () => {
   console.log(`API is ready on http://localhost:${PORT}`);
