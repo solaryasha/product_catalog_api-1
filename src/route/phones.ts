@@ -1,7 +1,9 @@
-import express, { Router } from 'express';
+import express, {Router} from 'express';
 
-import { phoneController } from '../controllers/phones';
+import {phoneController} from '../controllers/phones';
 
 export const phoneRouter = Router();
 
-phoneRouter.get('/', express.json(), phoneController.getPhones);
+phoneRouter.get('/', phoneController.getPhones);
+
+phoneRouter.get('/:phoneId', express.json(), phoneController.getOne);
