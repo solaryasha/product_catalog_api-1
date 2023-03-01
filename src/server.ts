@@ -1,27 +1,27 @@
 import express from 'express';
-import fs from 'fs';
-import path from 'path';
+import {phoneRouter} from './route/phones';
+
+export interface Phone {
+  id: number;
+  category: string;
+  phoneId: string;
+  itemId: string;
+  name: string;
+  fullPrice: number;
+  price: number;
+  screen: string;
+  capacity: string;
+  color: string;
+  ram: string;
+  year: number;
+  image: string;
+}
 
 const PORT = 5000;
 
 const app = express();
 
-app.get('/users', (request, response) => {
-  const absolutePath = path.join(__dirname, 'data/phones.json');
-
-  fs.readFile(absolutePath, (error, data) => {
-    if (error) {
-      console.log(error);
-
-      return;
-    }
-
-    response.send(data);
-  });
-});
-
-// app.get('/users/:userId', (request, response) => {
-// });
+app.use('/phones', phoneRouter);
 
 app.listen(PORT, () => {
   console.log(`API is ready on http://localhost:${PORT}`);
