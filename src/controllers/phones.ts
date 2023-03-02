@@ -1,7 +1,8 @@
-import { Request, Response } from 'express';
+import { Request, Response} from 'express';
 import fs from 'fs';
 import path from 'path';
-import { Phone } from '../server';
+import {Phone} from '../server';
+import { toSortData, phoneQuantity } from '../utils/helpers';
 
 const absolutePath = path.join(__dirname, '../data/phones.json');
 
@@ -15,26 +16,16 @@ export const getPhones = async (req: Request, res: Response) => {
 
     let dataFromJson: Phone[] = JSON.parse(data.toString());
 
-    const { sortBy } = req.query;
+    const {sortBy, filterBy } = req.query;
 
     console.log(sortBy);
 
     if (sortBy) {
-      if (sortBy === 'fromNewest') {
-        dataFromJson = dataFromJson.sort((a, b) => b.year - a.year);
-      }
+      dataFromJson = toSortData(dataFromJson, sortBy);
+    }
 
-      if (sortBy === 'fromOldest') {
-        dataFromJson = dataFromJson.sort((a, b) => a.year - b.year);
-      }
-
-      if (sortBy === 'fromHighPrice') {
-        dataFromJson = dataFromJson.sort((a, b) => b.fullPrice - a.fullPrice);
-      }
-
-      if (sortBy === 'fromLowPrice') {
-        dataFromJson = dataFromJson.sort((a, b) => a.fullPrice - b.fullPrice);
-      }
+    if (filterBy) {
+      dataFromJson = phoneQuantity(dataFromJson, filterBy);
     }
 
     res.send(dataFromJson);
@@ -42,7 +33,7 @@ export const getPhones = async (req: Request, res: Response) => {
 };
 
 export const getOne = (req: Request, res: Response) => {
-  const { phoneId } = req.params;
+  const {phoneId} = req.params;
 
   fs.readFile(absolutePath, (error, data) => {
     if (error) {
@@ -53,7 +44,7 @@ export const getOne = (req: Request, res: Response) => {
 
     const dataFromJson: Phone[] = JSON.parse(data.toString());
 
-    const foundPhone = dataFromJson.find(phone => +phone.id === +phoneId);
+    const foundPhone = dataFromJson.find((phone) => +phone.id === +phoneId);
 
     if (!foundPhone) {
       res.sendStatus(404);
@@ -64,5 +55,6 @@ export const getOne = (req: Request, res: Response) => {
 };
 
 export const phoneController = {
-  getPhones, getOne
+  getPhones,
+  getOne,
 };
