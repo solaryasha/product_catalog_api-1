@@ -1,34 +1,55 @@
-import { Request, Response} from 'express';
+import {Request, Response} from 'express';
 import fs from 'fs';
 import path from 'path';
 import {Phone} from '../server';
-import { toSortData, phoneQuantity } from '../utils/helpers';
+import {toSortData} from '../utils/helpers';
 
 const absolutePath = path.join(__dirname, '../data/phones.json');
 
 export const getPhones = async (req: Request, res: Response) => {
   fs.readFile(absolutePath, (error, data) => {
     if (error) {
-      console.log(error);
-
-      return;
+      res.send(error);
     }
 
     let dataFromJson: Phone[] = JSON.parse(data.toString());
 
-    const {sortBy, filterBy } = req.query;
-
-    console.log(sortBy);
+    const sortBy = (req.query.sortBy as string) || 'fromNewest';
 
     if (sortBy) {
       dataFromJson = toSortData(dataFromJson, sortBy);
     }
 
-    if (filterBy) {
-      dataFromJson = phoneQuantity(dataFromJson, filterBy);
-    }
+    const page = parseInt((req.query.page as string) || '1');
 
-    res.send(dataFromJson);
+    const limit = parseInt((req.query.limit as string) || '12');
+
+    const startIndex = (page - 1) * limit;
+
+    const endIndex = page * limit;
+
+    const totalItems = dataFromJson.length;
+
+    const totalPages = Math.ceil(totalItems / limit);
+
+    const prevPage = {
+      page: page - 1,
+      limit: limit,
+    };
+
+    const nextPage = {
+      page: page + 1,
+      limit: limit,
+    };
+
+    const result = {
+      pages: totalPages,
+      prev: prevPage,
+      next: nextPage,
+      result: dataFromJson.slice(startIndex, endIndex),
+    };
+
+    res.send(result);
   });
 };
 
