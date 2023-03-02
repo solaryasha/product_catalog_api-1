@@ -24,5 +24,5 @@ const app = express();
 app.use('/phones', phoneRouter);
 
 app.listen(process.env.PORT || PORT, () => {
-  console.log(`API is ready on port:${process.env.PORT}`);
+  console.log(`API is ready on port:${process.env.PORT}, changes`);
 });
